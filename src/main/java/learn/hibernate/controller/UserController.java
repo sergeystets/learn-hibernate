@@ -1,0 +1,39 @@
+package learn.hibernate.controller;
+
+import java.math.BigInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import learn.hibernate.entity.User;
+import learn.hibernate.services.IUserService;
+
+/**
+ * @author Sergii Stets
+ *         Created: 01.02.2016
+ **/
+@RestController
+public class UserController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private IUserService userService;
+
+    @RequestMapping(value = "/user")
+    public Iterable<User> getUsers() {
+        LOG.info("Requesting all users");
+        Iterable<User> users = userService.listUsers();
+        return users;
+    }
+
+    @RequestMapping(value = "/user/{id}")
+    public User getById(@PathVariable("id") BigInteger id) {
+        LOG.info("Requesting user by id " + id);
+        return userService.findUserById(id);
+    }
+}

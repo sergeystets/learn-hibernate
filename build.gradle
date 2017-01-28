@@ -1,0 +1,33 @@
+apply plugin: 'war'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring MVC
+    compile group: 'org.springframework', name: 'spring-webmvc', version: '4.2.1.RELEASE'
+    // Servlet API
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+    // Slf4j
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.6.0'
+    //  Logback core
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.3'
+    //  Logback classic
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.3'
+    //  JSON
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.6.4'
+    //  Spring Data JPA
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '1.9.1.RELEASE'
+    // Java Persistence API
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.0.Final'
+    // Data source
+    compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    // In memory DB
+    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.2.8'
+    // Hibernate core
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '4.1.9.Final'
+    // Hibernate entity manager
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.1.9.Final'
+}
+
