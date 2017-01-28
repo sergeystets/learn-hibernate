@@ -32,8 +32,8 @@ public class AppConfiguration {
     public DataSource hsqlDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(org.hsqldb.jdbcDriver.class.getName());
-       /* dataSource.setUsername("sa");
-        dataSource.setPassword("");*/
+        dataSource.setUsername("sa");
+        dataSource.setPassword("");
         dataSource.setUrl("jdbc:hsqldb:mem:mydb");
         return dataSource;
     }
