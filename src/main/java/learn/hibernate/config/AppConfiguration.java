@@ -1,9 +1,10 @@
 package learn.hibernate.config;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import learn.hibernate.config.dev.EmbeddedDataSourceConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -20,20 +21,11 @@ import javax.sql.DataSource;
  *         Created: 01.02.2016
  **/
 @Configuration
+@Import(EmbeddedDataSourceConfig.class)
 @EnableWebMvc
 @ComponentScan(basePackages = "learn.hibernate")
 @EnableJpaRepositories({"learn.hibernate.repository"})
 public class AppConfiguration {
-
-    @Bean
-    public DataSource hsqlDataSource() {
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(org.hsqldb.jdbcDriver.class.getName());
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
-        dataSource.setUrl("jdbc:hsqldb:mem:mydb");
-        return dataSource;
-    }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
