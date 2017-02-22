@@ -1,7 +1,11 @@
-language : java
+language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 addons:
-    mariadb: '10.0'
+  mariadb: '10.0'
 before_install:
- - chmod +x gradlew
+- chmod +x gradlew
+deploy:
+  provider: heroku
+  api_key:
+    secure: BDC6/Yq5XO59S8/iWMGQc77qOWDlX/CDLv25EjfEIO3sQ4Ly95xpjDGCPex8dEafJ3qV1a5cWaAvjwO/tRSbb5j0P0BOzAQ+tLQROEeC6+iNTd4Pi63vDtbrfriRNWKiGxZgskBLjcLWfhjsxBCRPPqJ9EF066NdqzxFIgv9cV9JgbJdPlB7D5odqVsqjuUz1SzLz1VZaooL1gPuU5PRXHs8W0AOQ16OoTYs2a+rnMqQgya3q5uWWPWS7liKLi6LC40QEE0OLO9zprIn8G29poIGiBtmOj2XYVLzsST12SNWKPuIzQdG0HTksXgBUB6TKpgYVBJy5aZeA6zZq6xtdJBnWddUW9uCMolR4QEM99Vi8nnn04XnvIfJ6U4Pps4AXzWV+DW558QHvTj4SP1clBQHZNbEGW7cdUu8P/iAJDpXwH/iDKGczM1h/a6s8P1SHDP/+S4PfX4PbJd7l9aIpPam+YJJhN7gMVODG7DNH9diKrflXr8yquEkHnYivj8yQQS9+VjMZE1Eq1L9k/nZ6howfpVIdZmURuelKh6c7eUWdYA+iALsT8PlqMeZ0jcGFcq4mSnosR+pSuSN9L6W6VTBaeBf4K6JLoiYvW2RphYigxoF2Jv8XdZ+iMMohDJr234nPOxCKE2YVfJMkqhz60YlagD3px7tT5GmVWJZ2EM=

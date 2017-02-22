@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import learn.hibernate.entity.User;
 
+
 @DataJpaTest
 @RunWith(SpringRunner.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -22,6 +24,7 @@ public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Ignore
     @Test
     @Transactional
     public void findById_whenFirstLevelCacheIsWorking() {
