@@ -45,7 +45,11 @@ dependencies {
     // Hibernate entity manager
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.1.9.Final'
     // MariaDB JDBC driver
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '1.1.7'
+    compile ('org.mariadb.jdbc:mariadb-java-client:1.1.7') {
+        // workaround to prevent compile error (mariadb-java-client has jna-3.3.0-platform.jar dependency which does not exist)
+        exclude group: 'net.java.dev.jna'
+    }
+    compile 'net.java.dev.jna:jna:3.3.0'
     // Google Guava Lib
     compile group: 'com.google.guava', name: 'guava', version: '21.0'
     //Lombok
