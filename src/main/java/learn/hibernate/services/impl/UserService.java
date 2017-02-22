@@ -2,7 +2,6 @@ package learn.hibernate.services.impl;
 
 import java.math.BigInteger;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import learn.hibernate.entity.User;
@@ -16,16 +15,19 @@ import learn.hibernate.services.IUserService;
 @Service
 public class UserService implements IUserService {
 
-    @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public Iterable<User> listUsers() {
-        return repository.findAll();
+        return userRepository.findAll();
     }
 
     @Override
     public User findUserById(BigInteger id) {
-        return repository.findOne(id);
+        return userRepository.findOne(id);
     }
 }

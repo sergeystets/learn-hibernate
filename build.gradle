@@ -24,8 +24,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     // Spring boot starter data jpa
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
-    // JUnit
-    testCompile("junit:junit")
     // Spring MVC
     compile group: 'org.springframework', name: 'spring-webmvc', version: '4.2.1.RELEASE'
     // Servlet API
@@ -42,4 +40,20 @@ dependencies {
     compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
     // In memory DB
     compile group: 'org.hsqldb', name: 'hsqldb', version: '2.2.8'
+    // Hibernate core
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '4.1.9.Final'
+    // Hibernate entity manager
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.1.9.Final'
+    // MariaDB JDBC driver
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '1.1.7'
+    // Google Guava Lib
+    compile group: 'com.google.guava', name: 'guava', version: '21.0'
+    //Lombok
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.14'
+
+    //JUnit
+    testCompile("junit:junit")
+    //Spring Boot Test
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+
 }
