@@ -1,36 +1,37 @@
 package learn.hibernate.repository;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Isolation;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import learn.hibernate.config.TestDBConfig;
+import learn.hibernate.entity.User;
 
-@ContextConfiguration(classes = TestDBConfig.class)
-@RunWith(SpringJUnit4ClassRunner.class)
+@DataJpaTest
+@RunWith(SpringRunner.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
 
     @Test
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
-    public void findAll() {
-        assertThat(userRepository, is(notNullValue()));
+    @Transactional
+    public void findById_whenFirstLevelCacheIsWorking() {
+        assertThat(userRepository).isNotNull();
 
-        userRepository.findOne(BigInteger.valueOf(3L));
-        userRepository.findOne(BigInteger.valueOf(3L));
-        userRepository.findOne(BigInteger.valueOf(3L));
+        User user = userRepository.findOne(BigInteger.valueOf(1L));
+        User cachedUser = userRepository.findOne(BigInteger.valueOf(1L));
+
+        assertThat(user).isNotNull();
+        assertThat(cachedUser).isNotNull();
+        assertThat(user).isEqualTo(cachedUser);
     }
-
 }
