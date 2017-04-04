@@ -20,7 +20,7 @@ import learn.hibernate.entity.User;
 @DataJpaTest
 @RunWith(SpringRunner.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(locations = "classpath:test.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 @Sql({"/db/scripts/schema.sql", "/db/scripts/data.sql"})
 public class UserRepositoryTest {
 

@@ -3,19 +3,29 @@ package learn.hibernate.entity;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- @author Sergii Stets
- Created: 01.02.2016
+ * @author Sergii Stets
+ *         Created: 01.02.2016
  **/
 @Entity
 @Table(name = "user")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String name;
+
+    public User() {
+    }
+
+    public User(String name) {
+        this.name = name;
+    }
 
     public BigInteger getId() {
         return id;

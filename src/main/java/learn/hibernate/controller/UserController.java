@@ -36,6 +36,6 @@ public class UserController {
     @RequestMapping(value = "/user/{id}")
     public User getById(@PathVariable("id") BigInteger id) {
         LOG.info("Requesting user by id " + id);
-        return userService.findUserById(id);
+        return userService.findUserById(id).orElse(null);
     }
 }
