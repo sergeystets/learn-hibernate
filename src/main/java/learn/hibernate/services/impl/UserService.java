@@ -35,27 +35,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Optional<User> findByName(String name) {
-        return userRepository.findByName(name);
-    }
-
-    @Override
     @Transactional
-    public void saveAndLog1(User user) {
+    public void saveAndLog(User user) {
         userRepository.save(user);
-        log1(user);
+        log(user);
     }
 
     @Override
     @Transactional(noRollbackFor = CustomRuntimeException.class)
-    public void saveAndLog2(User user) {
+    public void saveAndLogNoRollBack(User user) {
         userRepository.save(user);
-        log1(user);
+        log(user);
     }
 
     @Transactional
-    private void log1(User user) throws CustomRuntimeException {
+    private void log(User user) {
         throw new CustomRuntimeException();
     }
-
 }

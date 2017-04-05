@@ -11,9 +11,7 @@ public interface IUserService {
 
     Optional<User> findUserById(BigInteger id);
 
-    Optional<User> findByName(String name);
+    void saveAndLog(User user);
 
-    void saveAndLog1(User user);
-
-    void saveAndLog2(User user);
+    void saveAndLogNoRollBack(User user);
 }
