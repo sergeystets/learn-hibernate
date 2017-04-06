@@ -22,7 +22,7 @@ import learn.hibernate.services.IUserService;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/db/scripts/schema.sql")
 @WebAppConfiguration
-public class UserServiceTransactionsTest {
+public class TransactionsRollbackTests {
 
     @Autowired
     private IUserService userService;

@@ -59,5 +59,7 @@ dependencies {
     testCompile("junit:junit")
     //Spring Boot Test
     testCompile("org.springframework.boot:spring-boot-starter-test")
+    // p6 spy
+    compile "p6spy:p6spy:3.0.0"
 
 }
