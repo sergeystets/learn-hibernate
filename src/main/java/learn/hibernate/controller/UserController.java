@@ -29,12 +29,11 @@ public class UserController {
     @RequestMapping(value = "/user")
     public Iterable<User> getUsers() {
         LOG.info("Requesting all users");
-        Iterable<User> users = userService.listUsers();
-        return users;
+        return userService.listUsers();
     }
 
     @RequestMapping(value = "/user/{id}")
-    public User getById(@PathVariable("id") BigInteger id) {
+    public User getById(@PathVariable("id") Long id) {
         LOG.info("Requesting user by id " + id);
         return userService.findUserById(id).orElse(null);
     }

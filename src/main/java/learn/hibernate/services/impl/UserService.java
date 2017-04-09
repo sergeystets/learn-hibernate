@@ -1,6 +1,5 @@
 package learn.hibernate.services.impl;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -8,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import learn.hibernate.entity.User;
 import learn.hibernate.exceptions.CustomRuntimeException;
-import learn.hibernate.repository.UserRepository;
+import learn.hibernate.UserRepository;
 import learn.hibernate.services.IUserService;
 
 /**
@@ -30,20 +29,20 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Optional<User> findUserById(BigInteger id) {
+    public Optional<User> findUserById(Long id) {
         return Optional.ofNullable(userRepository.findOne(id));
     }
 
     @Override
     @Transactional
-    public void saveAndLog(User user) {
+    public void rollbackSave(User user) {
         userRepository.save(user);
         log(user);
     }
 
     @Override
     @Transactional(noRollbackFor = CustomRuntimeException.class)
-    public void saveAndLogNoRollBack(User user) {
+    public void noRollbackSave(User user) {
         userRepository.save(user);
         log(user);
     }

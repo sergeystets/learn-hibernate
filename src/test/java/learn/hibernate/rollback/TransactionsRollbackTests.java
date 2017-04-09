@@ -1,4 +1,4 @@
-package learn.hibernate.repository;
+package learn.hibernate.rollback;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +20,7 @@ import learn.hibernate.services.IUserService;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = AppConfiguration.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
-@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/db/scripts/schema.sql")
+@Sql(executionPhase = ExecutionPhase.AFTER_TEST_METHOD, scripts = "/db/scripts/schema.sql")
 @WebAppConfiguration
 public class TransactionsRollbackTests {
 
@@ -28,23 +28,23 @@ public class TransactionsRollbackTests {
     private IUserService userService;
 
     @Test
-    public void saveShouldRollBackWhenLogThrewRuntimeException() {
-        User expected = new User("Sergii");
+    public void transactionShouldRollback() {
+        User user = new User("Sergii");
         try {
-            userService.saveAndLog(expected);
+            userService.rollbackSave(user);
         } catch (CustomRuntimeException e) {
             // do nothing
         }
-        User actual = userService.findUserById(expected.getId()).orElse(null);
+        User actual = userService.findUserById(user.getId()).orElse(null);
 
         assertThat(actual).isNull();
     }
 
     @Test
-    public void saveShouldNotRollBackWhenLogThrewRuntimeException() {
+    public void transactionShouldNotRollBack() {
         User expected = new User("Sergii");
         try {
-            userService.saveAndLogNoRollBack(expected);
+            userService.noRollbackSave(expected);
         } catch (CustomRuntimeException e) {
             // do nothing
         }

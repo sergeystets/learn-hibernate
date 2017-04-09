@@ -1,4 +1,4 @@
-package learn.hibernate.repository;
+package learn.hibernate;
 
 import java.math.BigInteger;
 
@@ -10,6 +10,6 @@ import learn.hibernate.entity.User;
  * @author Sergii Stets
  *         Created: 01.02.2016
  **/
-public interface UserRepository extends CrudRepository<User, BigInteger> {
+public interface UserRepository extends CrudRepository<User, Long> {
 
 }

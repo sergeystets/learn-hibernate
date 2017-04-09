@@ -9,9 +9,9 @@ public interface IUserService {
 
     Iterable<User> listUsers();
 
-    Optional<User> findUserById(BigInteger id);
+    Optional<User> findUserById(Long id);
 
-    void saveAndLog(User user);
+    void rollbackSave(User user);
 
-    void saveAndLogNoRollBack(User user);
+    void noRollbackSave(User user);
 }
