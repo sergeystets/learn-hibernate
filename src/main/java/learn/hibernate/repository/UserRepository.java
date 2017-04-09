@@ -1,4 +1,4 @@
-package learn.hibernate;
+package learn.hibernate.repository;
 
 import java.math.BigInteger;
 

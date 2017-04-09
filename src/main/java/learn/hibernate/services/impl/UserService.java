@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import learn.hibernate.entity.User;
 import learn.hibernate.exceptions.CustomRuntimeException;
-import learn.hibernate.UserRepository;
+import learn.hibernate.repository.UserRepository;
 import learn.hibernate.services.IUserService;
 
 /**
