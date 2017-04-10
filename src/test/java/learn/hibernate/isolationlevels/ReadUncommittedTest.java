@@ -1,14 +1,18 @@
 package learn.hibernate.isolationlevels;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static learn.hibernate.SqlSupport.User.FIND_ALL_BY_NAME;
+import static learn.hibernate.SqlSupport.User.FIND_ONE;
+import static learn.hibernate.SqlSupport.User.INSERT_USER;
+import static learn.hibernate.SqlSupport.User.INSERT_USER_WITH_ID;
+import static learn.hibernate.SqlSupport.User.UPDATE_NAME;
+import static learn.hibernate.SqlSupport.User.mapper;
 
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -31,20 +35,12 @@ import learn.hibernate.entity.User;
 @WebAppConfiguration
 public class ReadUncommittedTest {
 
-    private static final String FIND_ONE = "SELECT * FROM user WHERE user.id = :id";
-    private static final String FIND_ALL_BY_NAME = "SELECT * FROM user WHERE user.name = :name";
-    private static final String UPDATE_NAME = "UPDATE user SET name = :name WHERE id = :id";
-    private static final String INSERT_USER = "INSERT INTO user (name) VALUES (:name)";
-    private static final String INSERT_USER_WITH_ID = "INSERT INTO user (id, name) VALUES (:id, :name)";
-
-    private static final RowMapper<User> mapper = BeanPropertyRowMapper.newInstance(User.class);
-
     @Autowired
     private PlatformTransactionManager txManager;
     @Autowired
     private NamedParameterJdbcTemplate jdbc;
 
-    @Test
+    @Test(timeout = 5000)
     public void phantomReadPermitted() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
@@ -71,7 +67,7 @@ public class ReadUncommittedTest {
         });
     }
 
-    @Test
+    @Test(timeout = 5000)
     public void lostUpdatePermitted() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
