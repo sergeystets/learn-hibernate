@@ -54,16 +54,16 @@ public class ReadUncommittedTest {
 
         // ----------------------------------------------tx1------------------------------------------------------------
         tx1.execute(s1 -> {
-            // [tx1] selecting user
+            // [tx1] select users
             List<User> usersBefore = jdbc.query(FIND_ALL_BY_NAME, new MapSqlParameterSource("name", "Dmytro"), mapper);
             assertThat(usersBefore).hasSize(1);
 
             // -------------------------------tx2-----------------------------------
-            // [tx2] doing inserts
+            // [tx2] insert new user
             tx2.execute(s2 -> jdbc.update(INSERT_USER, new BeanPropertySqlParameterSource(new User("Dmytro"))));
             // -------------------------------tx2-----------------------------------
 
-            // selecting user (phantom user appeared)
+            // [tx1] select user (new phantom user appeared)
             List<User> usersAfter = jdbc.query(FIND_ALL_BY_NAME, new MapSqlParameterSource("name", "Dmytro"), mapper);
             assertThat(usersAfter).hasSize(2);
             return null;
@@ -85,6 +85,7 @@ public class ReadUncommittedTest {
 
         // -----------------------------------------------tx1-----------------------------------------------------------
         tx1.execute(s1 -> {
+            // [tx1] select existing user
             User existing = jdbc.queryForObject(FIND_ONE, new BeanPropertySqlParameterSource(initialUser), mapper);
             assertThat(existing).isEqualToComparingFieldByField(initialUser);
 
