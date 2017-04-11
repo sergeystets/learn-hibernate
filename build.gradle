@@ -61,5 +61,6 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-test")
     // p6 spy
     compile "p6spy:p6spy:3.0.0"
-
+    // apache commons
+    compile  group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
 }

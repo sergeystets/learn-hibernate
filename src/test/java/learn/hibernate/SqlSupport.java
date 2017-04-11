@@ -3,6 +3,7 @@ package learn.hibernate;
 
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 public final class SqlSupport {
 
@@ -16,5 +17,16 @@ public final class SqlSupport {
         RowMapper<learn.hibernate.entity.User> mapper =
                 BeanPropertyRowMapper.newInstance(learn.hibernate.entity.User.class);
 
+        static MapSqlParameterSource id(Long id) {
+            return new MapSqlParameterSource("id", id);
+        }
+
+        static MapSqlParameterSource name(String name) {
+            return new MapSqlParameterSource("name", name);
+        }
+
+        static MapSqlParameterSource idAndName(Long id, String name) {
+            return new MapSqlParameterSource("id", id).addValue("name", name);
+        }
     }
 }
