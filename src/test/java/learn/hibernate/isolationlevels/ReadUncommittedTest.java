@@ -94,6 +94,7 @@ public class ReadUncommittedTest {
             tx2.execute(s2 -> jdbc.update(UPDATE_NAME, idAndName(initial.getId(), "Dmytro")));
             // -------------------------------tx2-----------------------------------
 
+            // [tx1] select user again (but got different result than before)
             User after = jdbc.queryForObject(FIND_ONE, id(initial.getId()), mapper);
             assertThat(after).isNot(equalTo(before));
             return null;
