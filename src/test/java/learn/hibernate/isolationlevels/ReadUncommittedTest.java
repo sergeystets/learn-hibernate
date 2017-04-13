@@ -2,23 +2,13 @@ package learn.hibernate.isolationlevels;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static learn.hibernate.AssertJConditions.equalTo;
-import static learn.hibernate.SqlSupport.User.FIND_ALL_BY_NAME;
-import static learn.hibernate.SqlSupport.User.FIND_ONE;
-import static learn.hibernate.SqlSupport.User.INSERT_USER;
-import static learn.hibernate.SqlSupport.User.INSERT_USER_WITH_ID;
-import static learn.hibernate.SqlSupport.User.UPDATE_NAME;
-import static learn.hibernate.SqlSupport.User.id;
-import static learn.hibernate.SqlSupport.User.idAndName;
-import static learn.hibernate.SqlSupport.User.mapper;
-import static learn.hibernate.SqlSupport.User.name;
 
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -30,6 +20,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import learn.hibernate.config.AppConfiguration;
 import learn.hibernate.entity.User;
+import learn.hibernate.repository.UserRepository;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = AppConfiguration.class)
@@ -41,9 +32,10 @@ public class ReadUncommittedTest {
     @Autowired
     private PlatformTransactionManager txManager;
     @Autowired
-    private NamedParameterJdbcTemplate jdbc;
+    @Qualifier("user-jdbc-repository")
+    private UserRepository userRepository;
 
-    @Test(timeout = 5000)
+    @Test
     public void dirtyReadPermitted() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
@@ -52,18 +44,18 @@ public class ReadUncommittedTest {
         User dirty = new User(1L, "Dmytro");
 
         // preconditions
-        jdbc.update(INSERT_USER_WITH_ID, new BeanPropertySqlParameterSource(initial));
+        userRepository.save(initial);
 
         // ----------------------------------------------tx1------------------------------------------------------------
         tx1.execute(s1 -> {
             // [tx1] update name of existing user
             String newName = dirty.getName();
-            jdbc.update(UPDATE_NAME, idAndName(initial.getId(), newName));
+            userRepository.updateUserName(newName, initial.getId());
 
             // -------------------------------tx2-----------------------------------
             tx2.execute(s2 -> {
                 // [tx2] here we read non-committed changes
-                User existing = jdbc.queryForObject(FIND_ONE, id(initial.getId()), mapper);
+                User existing = userRepository.findOne(initial.getId());
                 assertThat(existing).is(equalTo(dirty));
                 return null;
             });
@@ -73,7 +65,7 @@ public class ReadUncommittedTest {
         // ----------------------------------------------tx1------------------------------------------------------------
     }
 
-    @Test(timeout = 5000)
+    @Test
     public void nonRepeatableReadPermitted() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
@@ -81,84 +73,84 @@ public class ReadUncommittedTest {
         User initial = new User(1L, "Sergii");
 
         // preconditions
-        jdbc.update(INSERT_USER_WITH_ID, new BeanPropertySqlParameterSource(initial));
+        userRepository.save(initial);
 
         // ----------------------------------------------tx1------------------------------------------------------------
         tx1.execute(s1 -> {
             // [tx1] select user
-            User before = jdbc.queryForObject(FIND_ONE, id(initial.getId()), mapper);
+            User before = userRepository.findOne(initial.getId());
             assertThat(before).is(equalTo(initial));
 
             // -------------------------------tx2-----------------------------------
             // [tx2] update existing user
-            tx2.execute(s2 -> jdbc.update(UPDATE_NAME, idAndName(initial.getId(), "Dmytro")));
+            tx2.execute(s2 -> userRepository.updateUserName("Dmytro", initial.getId()));
             // -------------------------------tx2-----------------------------------
 
             // [tx1] select user again (but got different result than before)
-            User after = jdbc.queryForObject(FIND_ONE, id(initial.getId()), mapper);
+            User after = userRepository.findOne(initial.getId());
             assertThat(after).isNot(equalTo(before));
             return null;
         });
         // ----------------------------------------------tx1------------------------------------------------------------
     }
 
-    @Test(timeout = 5000)
+    @Test
     public void phantomReadPermitted() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
         // preconditions
-        jdbc.update(INSERT_USER, name("Dmytro"));
+        userRepository.save(new User("Dmytro"));
 
         // ----------------------------------------------tx1------------------------------------------------------------
         tx1.execute(s1 -> {
             // [tx1] select users
-            List<User> usersBefore = jdbc.query(FIND_ALL_BY_NAME, name("Dmytro"), mapper);
+            List<User> usersBefore = userRepository.findAllByName("Dmytro");
             assertThat(usersBefore).hasSize(1);
 
             // -------------------------------tx2-----------------------------------
             // [tx2] insert new user
-            tx2.execute(s2 -> jdbc.update(INSERT_USER, name("Dmytro")));
+            tx2.execute(s2 -> userRepository.save(new User("Dmytro")));
             // -------------------------------tx2-----------------------------------
 
             // [tx1] select user (new phantom user appeared)
-            List<User> usersAfter = jdbc.query(FIND_ALL_BY_NAME, name("Dmytro"), mapper);
+            List<User> usersAfter = userRepository.findAllByName("Dmytro");
             assertThat(usersAfter).hasSize(2);
             return null;
             // -------------------------------------------tx1-----------------------------------------------------------
         });
     }
 
-    @Test(timeout = 5000)
+    @Test
     public void lostUpdatePermitted() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
-        User initialUser = new User(1L, "Sergii");
+        User initial = new User(1L, "Sergii");
         User tx1User = new User(1L, "Sergii-TX1");
         User tx2User = new User(1L, "Sergii-TX2");
 
         // preconditions
-        jdbc.update(INSERT_USER_WITH_ID, new BeanPropertySqlParameterSource(initialUser));
+        userRepository.save(initial);
 
         // -----------------------------------------------tx1-----------------------------------------------------------
         tx1.execute(s1 -> {
             // [tx1] select existing user
-            User existing = jdbc.queryForObject(FIND_ONE, id(initialUser.getId()), mapper);
-            assertThat(existing).is(equalTo(initialUser));
+            User existing = userRepository.findOne(initial.getId());
+            assertThat(existing).is(equalTo(initial));
 
             // -------------------------------tx2-----------------------------------
             // [tx2] update existing user (updates will be lost)
-            tx2.execute(s2 -> jdbc.update(UPDATE_NAME, idAndName(existing.getId(), tx2User.getName())));
+            tx2.execute(s2 -> userRepository.updateUserName(tx2User.getName(), existing.getId()));
             // -------------------------------tx2-----------------------------------
 
             // [tx1] update existing user
-            jdbc.update(UPDATE_NAME, idAndName(existing.getId(), tx1User.getName()));
+            userRepository.updateUserName(tx1User.getName(), existing.getId());
             return null;
         });
         // -----------------------------------------------tx1-----------------------------------------------------------
 
-        User actual = jdbc.queryForObject(FIND_ONE, id(initialUser.getId()), mapper);
+        User actual = userRepository.findOne(initial.getId());
         assertThat(actual).is(equalTo(tx1User));
     }
 
