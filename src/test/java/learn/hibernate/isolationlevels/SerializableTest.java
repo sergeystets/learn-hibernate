@@ -1,9 +1,12 @@
 package learn.hibernate.isolationlevels;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static learn.hibernate.AssertJConditions.equalTo;
+import static learn.hibernate.AssertionsUtils.WaitingAssert.assertThatInvocationOf;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +31,7 @@ import learn.hibernate.repository.UserRepository;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/db/scripts/schema.sql")
 @WebAppConfiguration
-public class ReadUncommittedTest {
+public class SerializableTest {
 
     @Autowired
     private PlatformTransactionManager txManager;
@@ -37,12 +40,12 @@ public class ReadUncommittedTest {
     private UserRepository userRepository;
 
     @Test
-    public void dirtyRead_yes() {
+    public void dirtyRead_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
         User initial = new User(1L, "Sergii");
-        User dirty = new User(1L, "Dmytro");
+        User dirty = new User(1L, "Ivan");
 
         // preconditions
         userRepository.save(initial);
@@ -54,20 +57,18 @@ public class ReadUncommittedTest {
             userRepository.updateUserName(newName, initial.getId());
 
             // -------------------------------tx2-----------------------------------
-            tx2.execute(s2 -> {
-                // [tx2] here we read uncommitted changes
-                User existing = userRepository.findOne(initial.getId());
-                assertThat(existing).is(equalTo(dirty));
-                return null;
-            });
+            // [tx2] here we try to find user to check if it is dirty, but fail as serializable holds an exclusive lock
+            Callable<User> find = () -> tx2.execute(s2 -> userRepository.findOne(initial.getId()));
+            assertThatInvocationOf(find).willHangFor(4, SECONDS);
             // -------------------------------tx2-----------------------------------
             return null;
         });
         // ----------------------------------------------tx1------------------------------------------------------------
     }
 
+
     @Test
-    public void nonRepeatableRead_yes() {
+    public void nonRepeatableRead_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
@@ -83,47 +84,51 @@ public class ReadUncommittedTest {
             assertThat(before).is(equalTo(initial));
 
             // -------------------------------tx2-----------------------------------
-            // [tx2] update existing user
-            tx2.execute(s2 -> userRepository.updateUserName("Dmytro", initial.getId()));
+            // [tx2] here we try to update user to cause non-repeatable read, but fail
+            // as serializable holds an exclusive lock
+            Callable<Integer> update = () -> tx2.execute(s2 -> userRepository.updateUserName("Ivan", initial.getId()));
+            assertThatInvocationOf(update).willHangFor(4, SECONDS);
             // -------------------------------tx2-----------------------------------
 
-            // [tx1] select user again (but get different result than before)
+            // [tx1] select user again (should get the same result as before)
             User after = userRepository.findOne(initial.getId());
-            assertThat(after).isNot(equalTo(before));
+            assertThat(after).is(equalTo(before));
+
             return null;
         });
         // ----------------------------------------------tx1------------------------------------------------------------
     }
 
     @Test
-    public void phantomRead_yes() {
+    public void phantomRead_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
         // preconditions
-        userRepository.save(new User("Dmytro"));
+        userRepository.save(new User("Ivan"));
 
         // ----------------------------------------------tx1------------------------------------------------------------
         tx1.execute(s1 -> {
             // [tx1] select users
-            List<User> usersBefore = userRepository.findAllByName("Dmytro");
+            List<User> usersBefore = userRepository.findAllByName("Ivan");
             assertThat(usersBefore).hasSize(1);
 
             // -------------------------------tx2-----------------------------------
-            // [tx2] insert new user
-            tx2.execute(s2 -> userRepository.save(new User("Dmytro")));
+            // [tx2] here we try insert new phantom user but fail as serializable holds an exclusive lock
+            Callable<User> insert = () -> tx2.execute(s2 -> userRepository.save(new User("Ivan")));
             // -------------------------------tx2-----------------------------------
+            assertThatInvocationOf(insert).willHangFor(4, SECONDS);
 
-            // [tx1] select user (new phantom user appeared)
-            List<User> usersAfter = userRepository.findAllByName("Dmytro");
-            assertThat(usersAfter).hasSize(2);
+            // [tx1] select user (insert made by tx2 should be invisible)
+            List<User> usersAfter = userRepository.findAllByName("Ivan");
+            assertThat(usersAfter).hasSize(1);
             return null;
             // -------------------------------------------tx1-----------------------------------------------------------
         });
     }
 
     @Test
-    public void lostUpdate_yes() {
+    public void lostUpdate_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
@@ -141,9 +146,11 @@ public class ReadUncommittedTest {
             assertThat(existing).is(equalTo(initial));
 
             // -------------------------------tx2-----------------------------------
-            // [tx2] update existing user (updates will be lost)
-            tx2.execute(s2 -> userRepository.updateUserName(tx2User.getName(), existing.getId()));
+            // [tx2] here we try update user to simulate lost update, but fail as serializable holds an exclusive lock
+            Callable<Integer> update = () ->
+                    tx2.execute(s2 -> userRepository.updateUserName(tx2User.getName(), existing.getId()));
             // -------------------------------tx2-----------------------------------
+            assertThatInvocationOf(update).willHangFor(4, SECONDS);
 
             // [tx1] update existing user
             userRepository.updateUserName(tx1User.getName(), existing.getId());
@@ -162,7 +169,7 @@ public class ReadUncommittedTest {
     }
 
     private static void setIsolationAndPropagation(TransactionTemplate t) {
-        t.setIsolationLevel(TransactionDefinition.ISOLATION_READ_UNCOMMITTED);
+        t.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
         t.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 }

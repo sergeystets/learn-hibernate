@@ -28,7 +28,7 @@ import learn.hibernate.repository.UserRepository;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/db/scripts/schema.sql")
 @WebAppConfiguration
-public class ReadUncommittedTest {
+public class RepeatableReadTest {
 
     @Autowired
     private PlatformTransactionManager txManager;
@@ -37,7 +37,7 @@ public class ReadUncommittedTest {
     private UserRepository userRepository;
 
     @Test
-    public void dirtyRead_yes() {
+    public void dirtyRead_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
@@ -55,9 +55,10 @@ public class ReadUncommittedTest {
 
             // -------------------------------tx2-----------------------------------
             tx2.execute(s2 -> {
-                // [tx2] here we read uncommitted changes
+                // [tx2] here we do not read uncommitted changes
                 User existing = userRepository.findOne(initial.getId());
-                assertThat(existing).is(equalTo(dirty));
+                assertThat(existing).isNot(equalTo(dirty));
+                assertThat(existing).is(equalTo(initial));
                 return null;
             });
             // -------------------------------tx2-----------------------------------
@@ -67,7 +68,7 @@ public class ReadUncommittedTest {
     }
 
     @Test
-    public void nonRepeatableRead_yes() {
+    public void nonRepeatableRead_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
@@ -87,16 +88,16 @@ public class ReadUncommittedTest {
             tx2.execute(s2 -> userRepository.updateUserName("Dmytro", initial.getId()));
             // -------------------------------tx2-----------------------------------
 
-            // [tx1] select user again (but get different result than before)
+            // [tx1] select user again (should get the same result as before)
             User after = userRepository.findOne(initial.getId());
-            assertThat(after).isNot(equalTo(before));
+            assertThat(after).is(equalTo(before));
             return null;
         });
         // ----------------------------------------------tx1------------------------------------------------------------
     }
 
     @Test
-    public void phantomRead_yes() {
+    public void phantomRead_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
@@ -114,9 +115,9 @@ public class ReadUncommittedTest {
             tx2.execute(s2 -> userRepository.save(new User("Dmytro")));
             // -------------------------------tx2-----------------------------------
 
-            // [tx1] select user (new phantom user appeared)
+            // [tx1] select user (insert made by tx2 should be invisible)
             List<User> usersAfter = userRepository.findAllByName("Dmytro");
-            assertThat(usersAfter).hasSize(2);
+            assertThat(usersAfter).hasSize(1);
             return null;
             // -------------------------------------------tx1-----------------------------------------------------------
         });
@@ -162,7 +163,7 @@ public class ReadUncommittedTest {
     }
 
     private static void setIsolationAndPropagation(TransactionTemplate t) {
-        t.setIsolationLevel(TransactionDefinition.ISOLATION_READ_UNCOMMITTED);
+        t.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
         t.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 }

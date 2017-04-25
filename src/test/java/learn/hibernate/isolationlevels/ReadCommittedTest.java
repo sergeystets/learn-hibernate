@@ -28,7 +28,7 @@ import learn.hibernate.repository.UserRepository;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/db/scripts/schema.sql")
 @WebAppConfiguration
-public class ReadUncommittedTest {
+public class ReadCommittedTest {
 
     @Autowired
     private PlatformTransactionManager txManager;
@@ -37,7 +37,7 @@ public class ReadUncommittedTest {
     private UserRepository userRepository;
 
     @Test
-    public void dirtyRead_yes() {
+    public void dirtyRead_no() {
         TransactionTemplate tx1 = configuredTransactionTemplate();
         TransactionTemplate tx2 = configuredTransactionTemplate();
 
@@ -55,9 +55,10 @@ public class ReadUncommittedTest {
 
             // -------------------------------tx2-----------------------------------
             tx2.execute(s2 -> {
-                // [tx2] here we read uncommitted changes
+                // [tx2] here we do not read uncommitted changes
                 User existing = userRepository.findOne(initial.getId());
-                assertThat(existing).is(equalTo(dirty));
+                assertThat(existing).isNot(equalTo(dirty));
+                assertThat(existing).is(equalTo(initial));
                 return null;
             });
             // -------------------------------tx2-----------------------------------
@@ -162,7 +163,7 @@ public class ReadUncommittedTest {
     }
 
     private static void setIsolationAndPropagation(TransactionTemplate t) {
-        t.setIsolationLevel(TransactionDefinition.ISOLATION_READ_UNCOMMITTED);
+        t.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
         t.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 }
