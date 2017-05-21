@@ -45,7 +45,7 @@ dependencies {
     // Hibernate entity manager
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.1.9.Final'
     // MariaDB JDBC driver
-    compile ('org.mariadb.jdbc:mariadb-java-client:1.1.7') {
+    compile('org.mariadb.jdbc:mariadb-java-client:1.1.7') {
         // workaround to prevent compile error (mariadb-java-client has jna-3.3.0-platform.jar dependency which does not exist)
         exclude group: 'net.java.dev.jna'
     }
@@ -62,8 +62,14 @@ dependencies {
     // p6 spy
     compile "p6spy:p6spy:3.0.0"
     // apache commons
-    compile  group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     // awaitility DSL
     compile 'org.awaitility:awaitility-proxy:3.0.0-rc1'
-
+    // Spring Security
+    compile("org.springframework.boot:spring-boot-starter-security")
+    testCompile("org.springframework.security:spring-security-test")
+    // thymeleaf (template engine)
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    // SAML
+    compile 'org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE'
 }
