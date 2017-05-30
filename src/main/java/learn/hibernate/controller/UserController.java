@@ -5,16 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 import learn.hibernate.entity.User;
+import learn.hibernate.security.MenuCode;
 import learn.hibernate.services.IUserService;
 
 /**
  * @author Sergii Stets
  *         Created: 01.02.2016
  **/
-@RestController
+@MenuFrontierController(menuCode = MenuCode.USER)
 public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
