@@ -72,4 +72,5 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     // SAML
     compile 'org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE'
+    compile group: 'org.jgrapht', name: 'jgrapht-core', version: '0.9.0'
 }
