@@ -70,7 +70,10 @@ dependencies {
     testCompile("org.springframework.security:spring-security-test")
     // thymeleaf (template engine)
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
-    // SAML
-    compile 'org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE'
+    // LDAP
+    compile("org.springframework.ldap:spring-ldap-core")
+    compile("org.springframework.security:spring-security-ldap")
+    // Embedded ldap server (commonly for testing purposes)
+    compile 'org.apache.directory.server:apacheds-server-jndi:1.5.5'
     compile group: 'org.jgrapht', name: 'jgrapht-core', version: '0.9.0'
 }
