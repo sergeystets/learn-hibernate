@@ -10,25 +10,25 @@ ou: people
 
 ############# people start ####################
 
-dn: uid=rf,ou=people,dc=epam,dc=com
+dn: uid=admin,ou=people,dc=epam,dc=com
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
 objectclass: inetOrgPerson
-cn: RF RF
-sn: RF
-uid: rf
-userPassword: rf
+cn: admin admin
+sn: admin
+uid: admin
+userPassword: admin
 
-dn: uid=batch,ou=people,dc=epam,dc=com
+dn: uid=user,ou=people,dc=epam,dc=com
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
 objectclass: inetOrgPerson
-cn: BATCH BATCH
-sn: BATCH
-uid: batch
-userPassword: batch
+cn: user user
+sn: user
+uid: user
+userPassword: user
 
 ############# people end ####################
 
@@ -38,13 +38,13 @@ dn: cn=admin,ou=groups,dc=epam,dc=com
 objectclass: top
 objectclass: groupOfNames
 cn: admin
-member: uid=rf,ou=people,dc=epam,dc=com
+member: uid=admin,ou=people,dc=epam,dc=com
 
 #value group
 dn: cn=value,ou=groups,dc=epam,dc=com
 objectclass: top
 objectclass: groupOfNames
 cn: value
-member: uid=rf,ou=people,dc=epam,dc=com
+member: uid=admin,ou=people,dc=epam,dc=com
 
 ############# groups end ####################

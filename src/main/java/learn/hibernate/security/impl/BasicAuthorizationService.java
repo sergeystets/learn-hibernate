@@ -4,6 +4,10 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +35,9 @@ public class BasicAuthorizationService implements AuthorizationService {
     }
 
     @Override
-    public boolean hasAccess(UserDetails user, MenuCode... securedMenuItems) {
-        DirectedGraph<MenuCode, DefaultEdge> menu = menuManager.getMenuFor(user);
-        return nonNull(menu) && isNotEmpty(intersection(menu.vertexSet(), Sets.newHashSet(securedMenuItems)));
+    public boolean hasAccess(UserDetails user, MenuCode... menuItems) {
+        DirectedGraph<String, DefaultEdge> menu = menuManager.getMenuFor(user);
+        List<String> items = Stream.of(menuItems).map(MenuCode::getValue).collect(Collectors.toList());
+        return nonNull(menu) && isNotEmpty(intersection(menu.vertexSet(), items));
     }
 }

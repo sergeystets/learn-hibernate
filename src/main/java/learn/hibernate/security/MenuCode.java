@@ -7,8 +7,8 @@ package learn.hibernate.security;
 public enum MenuCode {
 
     EQ("EQ"),
-    RF("RF"),
-    BATCH("BATCH");
+    WORK_WITH_WEEKS_OF_SUPPLY("BK_01"), // work with supply tables (EQ-> 04 -> 50 ->01)
+    ORDER_PARAMETERS("BK_02"); // work with supply tables (EQ-> 04 -> 50 ->02)
 
     private final String value;
 

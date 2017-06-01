@@ -9,5 +9,5 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public interface MenuManager {
 
-    DirectedGraph<MenuCode, DefaultEdge> getMenuFor(UserDetails user);
+    DirectedGraph<String, DefaultEdge> getMenuFor(UserDetails user);
 }
