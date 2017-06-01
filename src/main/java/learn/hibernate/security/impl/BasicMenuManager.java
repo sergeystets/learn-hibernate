@@ -86,19 +86,25 @@ public class BasicMenuManager implements MenuManager {
                                         Set<String> customMenu,
                                         Set<String> granted) {
         for (String candidate : candidates) {
-            List<String> neighbors = getNeighborsOf(candidate, candidates);
+
             List<String> children = Graphs.successorListOf(menu, candidate);
-            List<String> parents = Graphs.predecessorListOf(menu, candidate);
 
             Supplier<Boolean> grantedExplicitly = () -> granted.contains(candidate);
             Supplier<Boolean> anyChildGranted = () -> isAnyGrantedRecursively(menu, children, granted);
-            Supplier<Boolean> anyNeighborGranted = () -> isAnyGrantedRecursively(menu, neighbors, granted);
-            Supplier<Boolean> parentGranted = () -> isNotEmpty(intersection(parents, customMenu));
 
-            if (grantedExplicitly.get() || anyChildGranted.get()
-                    || (!anyNeighborGranted.get() && parentGranted.get())) {
+            Supplier<Boolean> anyNeighborGranted = () -> {
+                List<String> neighbors = getNeighborsOf(candidate, candidates);
+                return isAnyGrantedRecursively(menu, neighbors, granted);
+            };
+            Supplier<Boolean> parentGranted = () -> {
+                List<String> parents = Graphs.predecessorListOf(menu, candidate);
+                return isNotEmpty(intersection(parents, customMenu));
+            };
+
+            if (grantedExplicitly.get() || anyChildGranted.get() || (!anyNeighborGranted.get() && parentGranted.get())) {
                 customMenu.add(candidate);
             }
+
             buildCustomMenu(menu, children, customMenu, granted);
         }
     }
