@@ -2,20 +2,18 @@ package learn.hibernate.security;
 
 import static java.util.Objects.nonNull;
 
-import java.util.Objects;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import learn.hibernate.controller.MenuFrontierController;
+import learn.hibernate.security.annotations.MenuController;
+import learn.hibernate.security.annotations.SubMenuController;
 
 /**
  * @author Sergii Stets
@@ -26,26 +24,44 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
     private static final String ACCESS_DENIED = "Access denied";
 
+    private final AuthorizationService authorizationService;
+
     @Autowired
-    private AuthorizationService authorizationService;
+    public AuthorizationInterceptor(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
+    }
 
     @Override
-    public boolean preHandle(HttpServletRequest request,
-                             HttpServletResponse response,
-                             Object handler) throws Exception {
-        if (handler instanceof HandlerMethod) {
-            HandlerMethod method = (HandlerMethod) handler;
-            MenuFrontierController menuInfo = method.getBeanType().getAnnotation(MenuFrontierController.class);
-            if (nonNull(menuInfo)) {
-                User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                boolean isAuthorized = authorizationService.authorize(user, menuInfo.menuCode());
-                if (!isAuthorized) {
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, ACCESS_DENIED);
+    public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
+        if (supports(handler)) {
+            MenuCode[] securedMenuItems = getSecuredMenuItems((HandlerMethod) handler);
+            if (nonNull(securedMenuItems)) {
+                boolean assessDenied = !authorizationService.hasAccess(currentUser(), securedMenuItems);
+                if (assessDenied) {
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, ACCESS_DENIED);
                 }
-            } else {
-                return true;
             }
         }
         return true;
+    }
+
+    private MenuCode[] getSecuredMenuItems(HandlerMethod handler) {
+        MenuController menu = handler.getBeanType().getAnnotation(MenuController.class);
+        SubMenuController subMenu = handler.getBeanType().getAnnotation(SubMenuController.class);
+
+        if (nonNull(menu)) {
+            return new MenuCode[]{menu.value()};
+        } else if (nonNull(subMenu)) {
+            return subMenu.parentMenu();
+        }
+        return null;
+    }
+
+    private UserDetails currentUser() {
+        return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private boolean supports(Object handler) {
+        return handler instanceof HandlerMethod;
     }
 }

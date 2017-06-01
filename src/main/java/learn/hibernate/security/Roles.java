@@ -1,7 +1,7 @@
 package learn.hibernate.security;
 
 public enum Roles {
-    USER("USER"),
+    USER("MAIN"),
     ADMIN("ADMIN");
 
     private final String roleName;

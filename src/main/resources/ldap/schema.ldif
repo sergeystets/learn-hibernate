@@ -1,0 +1,40 @@
+dn: ou=groups,dc=epam,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=epam,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+############# people start ####################
+
+dn: uid=sergeystets,ou=people,dc=epam,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Sergii Stets
+sn: Sergii
+uid: sergeystets
+userPassword: sergeystets
+
+############# people end ####################
+
+############# groups start ####################
+#admin group
+dn: cn=admin,ou=groups,dc=epam,dc=com
+objectclass: top
+objectclass: groupOfNames
+cn: admin
+member: uid=sergeystets,ou=people,dc=epam,dc=com
+
+#value group
+dn: cn=value,ou=groups,dc=epam,dc=com
+objectclass: top
+objectclass: groupOfNames
+cn: value
+member: uid=sergeystets,ou=people,dc=epam,dc=com
+
+############# groups end ####################

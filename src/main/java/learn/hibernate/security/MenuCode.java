@@ -6,15 +6,17 @@ package learn.hibernate.security;
  */
 public enum MenuCode {
 
-    USER("USER");
+    MAIN("MAIN"),
+    RF("RF"),
+    BATCH("BATCH");
 
-    private final String user;
+    private final String value;
 
-    MenuCode(String user) {
-        this.user = user;
+    MenuCode(String value) {
+        this.value = value;
     }
 
-    public String getUser() {
-        return user;
+    public String getValue() {
+        return value;
     }
 }

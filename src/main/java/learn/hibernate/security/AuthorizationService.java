@@ -1,6 +1,6 @@
 package learn.hibernate.security;
 
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * @author Sergii Stets
@@ -8,6 +8,6 @@ import org.springframework.security.core.userdetails.User;
  */
 public interface AuthorizationService {
 
-    boolean authorize(User user, MenuCode menu);
+    boolean hasAccess(UserDetails user, MenuCode... securedMenuItems);
 
 }
