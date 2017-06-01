@@ -83,9 +83,10 @@ public class BasicMenuManager implements MenuManager {
         for (MenuCode candidate : candidates) {
             List<MenuCode> neighbors = getNeighborsOf(candidate, candidates);
             List<MenuCode> children = Graphs.successorListOf(menu, candidate);
+            List<MenuCode> parents = Graphs.predecessorListOf(menu, candidate);
             boolean anyChildGranted = isAnyGrantedRecursively(menu, children, granted);
             boolean anyNeighborGranted = isAnyGrantedRecursively(menu, neighbors, granted);
-            boolean parentGranted = isNotEmpty(intersection(Graphs.predecessorListOf(menu, candidate), customMenu));
+            boolean parentGranted = isNotEmpty(intersection(parents, customMenu));
 
             if (granted.contains(candidate) || anyChildGranted || (!anyNeighborGranted && parentGranted)) {
                 customMenu.add(candidate);
