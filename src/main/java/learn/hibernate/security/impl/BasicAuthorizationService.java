@@ -4,8 +4,8 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
-import java.util.Set;
-
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class BasicAuthorizationService implements AuthorizationService {
 
     @Override
     public boolean hasAccess(UserDetails user, MenuCode... securedMenuItems) {
-        Set<MenuCode> menu = menuManager.getMenuFor(user);
-        return nonNull(menu) && isNotEmpty(intersection(menu, Sets.newHashSet(securedMenuItems)));
+        DirectedGraph<MenuCode, DefaultEdge> menu = menuManager.getMenuFor(user);
+        return nonNull(menu) && isNotEmpty(intersection(menu.vertexSet(), Sets.newHashSet(securedMenuItems)));
     }
 }

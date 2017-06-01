@@ -1,7 +1,7 @@
 package learn.hibernate.security;
 
-import java.util.Set;
-
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -9,5 +9,5 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public interface MenuManager {
 
-    Set<MenuCode> getMenuFor(UserDetails user);
+    DirectedGraph<MenuCode, DefaultEdge> getMenuFor(UserDetails user);
 }
