@@ -1,10 +1,11 @@
 package learn.hibernate.controller;
 
-import static learn.hibernate.security.MenuCode.MAIN;
+import static learn.hibernate.security.MenuCode.EQ;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import learn.hibernate.security.annotations.MenuController;
 
@@ -13,11 +14,11 @@ import learn.hibernate.security.annotations.MenuController;
  *         Created: 01.02.2016
  **/
 @RestController
-@MenuController(MAIN)
+@MenuController(EQ)
 public class MainController {
 
-    @RequestMapping(value ="main/greeting", method = RequestMethod.GET)
-    public String sayHello() {
-        return "hello from " + MAIN + " menu";
+    @RequestMapping(value ="/", method = RequestMethod.GET)
+    public ModelAndView getMainMenu() {
+        return new ModelAndView("eq");
     }
 }

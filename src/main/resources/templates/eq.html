@@ -2,10 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head>
-        <title>Landing!</title>
+        <title>EQ Menu</title>
     </head>
     <body>
-        <h1>You are logged in </h1>
+        <p>
+            <a th:href="@{/rf/greeting}">1 - (RF) Radio Frequency</a><br/>
+        </p>
+        <p>
+            <a th:href="@{/batch/greeting}">2 - (BATCH) Audit Batch</a><br/>
+        </p>
         <p>
             <a th:href="@{/login?logout}">Logout</a><br/>
         </p>

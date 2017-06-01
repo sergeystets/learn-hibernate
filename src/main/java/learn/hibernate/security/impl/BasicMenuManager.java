@@ -1,6 +1,6 @@
 package learn.hibernate.security.impl;
 
-import static learn.hibernate.security.MenuCode.MAIN;
+import static learn.hibernate.security.MenuCode.EQ;
 import static learn.hibernate.security.MenuCode.RF;
 
 import java.util.Map;
@@ -38,6 +38,6 @@ public class BasicMenuManager implements MenuManager {
      */
     private void initCustomMenus() {
         // map user to it's custom menu
-        this.customMenus = ImmutableMap.of("sergeystets", ImmutableSet.of(MAIN, RF));
+        this.customMenus = ImmutableMap.of("sergeystets", ImmutableSet.of(EQ, RF));
     }
 }

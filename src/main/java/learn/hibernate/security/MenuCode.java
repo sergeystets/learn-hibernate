@@ -6,7 +6,7 @@ package learn.hibernate.security;
  */
 public enum MenuCode {
 
-    MAIN("MAIN"),
+    EQ("EQ"),
     RF("RF"),
     BATCH("BATCH");
 
