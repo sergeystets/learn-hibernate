@@ -95,8 +95,8 @@ public class BasicMenuManager implements MenuManager {
             Supplier<Boolean> anyNeighborGranted = () -> isAnyGrantedRecursively(menu, neighbors, granted);
             Supplier<Boolean> parentGranted = () -> isNotEmpty(intersection(parents, customMenu));
 
-            if (grantedExplicitly.get() || anyChildGranted.get() || (!anyNeighborGranted.get() && parentGranted.get()
-            )) {
+            if (grantedExplicitly.get() || anyChildGranted.get()
+                    || (!anyNeighborGranted.get() && parentGranted.get())) {
                 customMenu.add(candidate);
             }
             buildCustomMenu(menu, children, customMenu, granted);
