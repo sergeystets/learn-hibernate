@@ -46,7 +46,8 @@ public interface AssertionsUtils {
                     until(function, willReturnAnything());
         }
 
-        // Is the same as org.hamcrest.Matchers.anything(). Created purely for the sake of readability.
+        // Is the same as org.hamcrest.Matchers.anything().
+        // Created purely for the sake of readability.
         private static Matcher<Object> willReturnAnything() {
             return anything();
         }
