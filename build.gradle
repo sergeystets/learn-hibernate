@@ -46,7 +46,7 @@ dependencies {
     // Hibernate entity manager
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.1.9.Final'
     // MariaDB JDBC driver
-    compile('org.mariadb.jdbc:mariadb-java-client:1.1.7') {
+    compile('org.mariadb.jdbc:mariadb-java-client:2.0.2') {
         // workaround to prevent compile error (mariadb-java-client has jna-3.3.0-platform.jar dependency which does not exist)
         exclude group: 'net.java.dev.jna'
     }
